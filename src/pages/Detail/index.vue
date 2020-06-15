@@ -86,12 +86,12 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt">
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input autocomplete="off" class="itxt" v-model="skuNum">
+                <a href="javascript:" class="plus" @click="skuNum=skuNum*1+1">+</a>
+                <a href="javascript:" class="mins" @click="skuNum=skuNum>1 ? skuNum-1 : skuNum">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a href="javascript:" @click="addToCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -351,7 +351,9 @@ import {mapState,mapGetters} from 'vuex'
     name: 'Detail',
     data(){
       return{
-        currentIndex:0
+        currentIndex:0,
+        // 加购物车商品的数量
+        skuNum:1
       }
     },
 
@@ -367,7 +369,77 @@ import {mapState,mapGetters} from 'vuex'
         valueList.forEach(value=>value.isChecked='0')
         // 将指定的value选中
         value.isChecked='1'
+      },
+    //  将当前商品添加到购物车
+    async  addToCart(){
+        // 收集数据
+        const skuNum = this.skuNum
+        const skuId = this.$route.params.id
+
+        // 第一种方式：使用回调函数数据
+        // this.$store.dispatch('addToCart',{skuId,skuNum,callback:this.callback})
+
+        // 第二种方式：利用dispatch()的返回值是promise
+
+      //  const promise=this.$store.dispatch('addToCart2',{skuId,skuNum})
+      //  console.log('/////',promise)
+      //  promise.then(()=>{
+      //   //  成功
+      //   this.$router.push('/addcartsuccess')
+      //  }).catch(error=>{
+      //   //  失败
+      //   alert(error.message)
+      //  })
+
+      // 第三种方式：使用try/catch
+
+      // try {
+      //  await this.$store.dispatch('addToCart2',{skuId,skuNum})
+      //  this.$router.push('/addcartsuccess')
+        
+      // } catch (error) {
+      //   alert(error.message)
+        
+      // }
+
+   
+      // const errorMsg=await this.$router.dispatch('addToCart3',{skuId,skuNum})
+      // if(errorMsg){
+      //   // 失败
+      //   alert(errorMsg)
+      // }else{
+      //   // 成功:  保存query参数，跳转依然携带参数，使用sessionStorage(浏览器刷新依然存在，当浏览器关闭时不存在)
+      //   window.sessionStorage.setItem('SKU_INFO_KEY',JSON.stringify(this.skuInfo))
+      //   // 跳转路由，携带skuNum的query参数
+      //   this.$router.push({path:'/addcartsuccess',query:{skuNum}})
+      //  }
+
+       const errorMsg = await this.$store.dispatch('addToCart3', {skuNum, skuId})
+        if (errorMsg) { // 失败
+          alert(errorMsg)
+        } else { // 成功
+
+          // 将当前商品的skuInfo的json文本保存到sessionStorage中
+          window.sessionStorage.setItem('SKU_INFO_KEY', JSON.stringify(this.skuInfo))
+          // 跳转路由, 携带skuNum的query参数
+          this.$router.push({path: '/addcartsuccess', query: {skuNum}})
+        }
+      },
+      callback(errorMsg){
+        if(errorMsg){
+          // 失败，如果失败了就会提示
+          alert(errorMsg)
+
+        }else{
+          // 成功，如果成功了就会跳转到成功的路由
+          //编程式路由导航 push一级一级回退，有信息记录
+          this.$router.push('/addcartsuccess')
+
+        }
       }
+
+     
+
 
     },
 

@@ -75,6 +75,8 @@
             //   ...mapState({
             //       categoryList2:'categoryList'
             //   }) //categoryList(){return this.$store.state['categoryList]'}
+
+            // 读取state中的数据到组件中
             ...mapState({
                 //右边是一个回调函数，回调函数接收是总state，返回值就作为计算属性的值
                 categoryList: state => state.home.categoryList
@@ -85,6 +87,7 @@
             // this.getCategoryList() //数据从接口转移到vuex的state中
         },
         methods: {
+            // 触发action调用，请求获取数据到state中
             ...mapActions(['getCategoryList']), //getCategoryList(){this.$store.dispatch('getCategoryList')}
             //显示一级分类列表
             showFirstCategorys(){

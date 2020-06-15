@@ -6,7 +6,7 @@
 import axios from 'axios'
 import NProgress from 'nprogress'
 
-//1.配置通用的基础路径和超时
+//1.配置通用的基础路径和超时  axios的构造函数
 const instance = axios.create({
     // baseURL:'http://182.92.128.115/api', //基础path
     baseURL:'/api', //基础path

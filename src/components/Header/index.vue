@@ -6,16 +6,20 @@
       <div class="container">
         <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
+          <p v-if="userInfo.token">
+            <span>{{userInfo.name}}</span> &nbsp;&nbsp;
+            <a href="javascript:" @click="logout">退出</a>
+          </p>
+          <p v-else>
             <span>请</span>
-            <!-- <router-link to="login">登录 |</router-link> -->
-            <router-link :to="{path:'/login'}">登录 |</router-link>
-            <router-link to="register"> 免费注册</router-link>
+            <!-- <router-link to="/login">登录</router-link> -->
+            <router-link :to="{path: '/login'}">登录</router-link>
+            <router-link to="/register" class="register">免费注册</router-link>
           </p>
         </div>
         <div class="typeList">
           <a href="###">我的订单</a>
-          <router-link to='/shopcart'>我的购物车</router-link>
+          <router-link to="/shopcart">我的购物车</router-link>
           <a href="###">我的尚品汇</a>
           <a href="###">尚品汇会员</a>
           <a href="###">企业采购</a>
@@ -28,17 +32,15 @@
     <!--头部第二行 搜索区域-->
     <div class="bottom">
       <h1 class="logoArea">
-        <!-- <a class="logo" title="尚品汇" href="###" target="_blank"> -->
-          <router-link to="/">
-            <img src="./images/logo.png" alt="">
-          </router-link>
-        <!-- </a> -->
+        <router-link to="/">
+          <img src="./images/logo.png" alt="">
+        </router-link>
       </h1>
 
       <div class="searchArea">
-        <form action="###" class="searchForm" @submit.prevent="search">
-          <input type="text" id="autocomplete" class="input-error input-xxlarge" v-model="keyword"/>
-          <!-- <button class="sui-btn btn-xlarge btn-danger" type="button" @click="search">搜索</button> -->
+        <form action="/xxx" class="searchForm" @submit.prevent="search">
+          <input type="text" id="autocomplete" class="input-error input-xxlarge"  v-model="keyword"/>
+          <!-- <button class="sui-btn btn-xlarge btn-danger" @click.prevent="search">搜索</button> -->
           <button class="sui-btn btn-xlarge btn-danger">搜索</button>
         </form>
       </div>
@@ -49,6 +51,12 @@
 <script>
   export default {
     name: 'Header',
+
+    computed: {
+      userInfo () {
+        return this.$store.state.user.userInfo
+      }
+    },
     data () {
       return {
         keyword: ''
@@ -61,6 +69,16 @@
       })
     },
     methods: {
+      logout(){
+        if(confirm('你确定要退出吗？')){
+          this.$store.dispatch('logout').then(()=>{
+            this.$router.push('/login')
+          }).catch(error=>{
+            alert(error.message)
+          })
+        }
+
+      },
       search(){
         const {keyword} = this
         //编程式跳转

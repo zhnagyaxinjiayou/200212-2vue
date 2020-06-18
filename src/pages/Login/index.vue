@@ -18,13 +18,22 @@
 								
 								<div class="input-text clearFix">
 									<i></i>
-									<input type="text" placeholder="手机号" v-model="mobile">
+                  <input type="text" placeholder="请输入你的手机号" v-model="mobile"
+                    v-validate="{required: true,regex: /^1\d{10}$/}"  name="phone"
+                    :class="{invalid: errors.has('phone')}">
+                     <span class="error-msg">{{ errors.first('phone') }}</span>
+
+									<!-- <input type="text" placeholder="手机号" v-model="mobile"> -->
 									<!-- <span class="error-msg">错误提示信息</span> -->
 								</div>
 
 								<div class="input-text clearFix">
 									<i class="pwd"></i>
-									<input type="password" placeholder="请输入密码" v-model="password">
+                  	<input type="password" placeholder="请输入你的登录密码" v-model="password"
+                      name="密码" v-validate="{required: true, min: 6, max: 10}" 
+                      :class="{invalid: errors.has('密码')}">
+                    <span class="error-msg">{{ errors.first('密码') }}</span>
+									<!-- <input type="password" placeholder="请输入密码" v-model="password"> -->
 									<!-- <span class="error-msg">错误提示信息</span> -->
 								</div>
 
@@ -78,28 +87,45 @@ export default {
     return{
       mobile:'',
       password:''
-
     }
   },
 
   methods: {
-    async login(){
-      //取出收集的数据
+     async login(){
+      // 先进行前台表单效验，如果不通过提示并结束
+        const success = await this.$validator.validateAll() // 对所有表单项进行验证
+
+      if(success){
+         // 取出相关数据
       const {mobile,password}=this
-
-      // 进行前台表单验证, 如果不通过, 显示提示, 并结束
-
       try {
-        // 分发注册的异步action
-        await this.$store.dispatch('login',{mobile, password})
-        // 如果成功了, 跳转到首页
+        // 分发给登录
+         await this.$store.dispatch('login',{mobile, password})
+        // 登录成功，自动登录界面
         this.$router.replace('/')
       } catch (error) {
-        // 如果失败了, 提示失败信息
-         alert(error.message)
+           alert(error.message)
       }
+      } else{
+        console.log('效验未通过')
+        }
+      },
 
-    }
+      // 在进入当前组件前调用(此时组件对象还没有创建)
+    // 不能直接在此函数中通过this得到组件对象
+      beforeRouteEnter (to, from, next) {
+        next(vm=>{ // 此回调函数在组件对象创建后调用, 且传入的是组件对象
+        // 通过 `vm` 访问组件实例  vm就是当前组件对象
+          const token=vm.$store.state.user.userInfo.token
+          if(token){
+            // 强制
+            next('/')
+          }else{
+            // 放行
+            next()
+          }
+        })
+      }
   },
 }
 </script>

@@ -21,6 +21,12 @@ instance.interceptors.request.use(config => { //真正发送请求前执行
      /* 5. 每个请求自动携带userTempId的请求头: 在请求拦截器中实现 */
       config.headers['userTempId']=store.state.user.userTempId
 
+    //   6.登入后每个请自动携带token的请求头
+    const token=store.state.user.userInfo.token
+    if(token){
+        config.headers['token']=token
+    }
+
     return config
 })
 //注册响应拦截器

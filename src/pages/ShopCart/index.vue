@@ -42,7 +42,8 @@
               input事件：输入改变时触发
               change事件：失去焦点才触发
              -->
-            <input autocomplete="off" type="text" value="1" minnum="1" class="itxt" :value="item.skuNum" 
+            <input autocomplete="off" type="text" value="1" minnum="1" class="itxt" :value="item.skuNum"
+            @keyup="validInput" 
             @change="changeItenCount(item,$event.target.value-item.skuNum,$event)" >
 
             <a href="javascript:void(0)" class="plus" @click="changeItenCount(item,1)">+</a>
@@ -78,7 +79,7 @@
           <i class="summoney">{{totalPrice}}</i>
         </div>
         <div class="sumbtn">
-          <a class="sum-btn" href="###" target="_blank">结算</a>
+          <router-link class="sum-btn" to="/trade">结算</router-link> 
         </div>
       </div>
     </div>
@@ -123,6 +124,14 @@ import {mapState, mapGetters} from 'vuex'
     },
 
     methods: {
+      // 检查 输入字符
+      validInput(event){
+        // 得到输入框
+        const input=event.target
+        // 将输入框中的开头的n个0或者n个非数字替换为空串
+        input.value=input.value.replace(/^0+|\D+0*/g,'')
+
+      },
       // 勾选、不勾选指定的购物项
      async checkCartItem(item){
         // 准备数据

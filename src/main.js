@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import VueLazyload from 'vue-lazyload'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -8,16 +9,27 @@ import '@/mock/mockServer' //引入加载
 import 'swiper/css/swiper.min.css'
 import Pagination from './components/Pagination'
 
+
 // 不使用vuex去做，将接口请求函数挂载到vue原型对象上
 // 引入api模块中的所有分别暴露的函数，封装到API对象中
 import * as API from '@/api'
 
 import './validate' 
+import './elements'
+
+import loading from './assets/images/loading.gif'
+
+// 配置vue的插件
+Vue.use(VueLazyload, { // 内部自定义一个指令: lazy
+  loading,  // 配置loading图片
+})
 
 // 注册全局组件
 Vue.component('TypeNav',TypeNav)
 Vue.component('Carousel',Carousel)
 Vue.component('Pagination',Pagination)
+
+
 
 //将API对象保存到vue的原型对象上===>让所有的组件对象都直接可见（不用再引入API）
 Vue.prototype.$API=API

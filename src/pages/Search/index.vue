@@ -73,7 +73,8 @@
                     <a href="javascript:;">
                       <!-- <img :src="item.defaultImg" /> -->
                       <router-link :to="`/detail/${item.id}`">
-                      <img :src="item.defaultImg" />
+                      <!-- <img :src="item.defaultImg" /> -->
+                      <img v-lazy="item.defaultImg" />
                       </router-link>
                     </a>
                   </div>

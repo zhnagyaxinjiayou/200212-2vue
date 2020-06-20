@@ -8,7 +8,7 @@
         </h4>
         <div class="paymark">
           <span class="fl">请您在提交订单<em class="orange time">4小时</em>之内完成支付，超时订单会自动取消。订单号：<em>145687</em></span>
-          <span class="fr"><em class="lead">应付金额：</em><em class="orange money">￥17,654</em></span>
+          <span class="fr"><em class="lead">应付金额：</em><em class="orange money">￥{{payInfo.totalFee}}</em></span>
         </div>
       </div>
       <div class="checkout-info">
@@ -65,7 +65,9 @@
         <div class="hr"></div>
 
         <div class="submit">
-          <router-link class="btn" to="/paysuccess">立即支付</router-link>
+          <!-- <router-link class="btn" to="/paysuccess" @click="pay">立即支付</router-link> -->
+          <a href="javascript:" class="btn" @click="pay">立即支付</a>
+
         </div>
         <div class="otherpay">
           <div class="step-tit">
@@ -82,8 +84,94 @@
 </template>
 
 <script>
+import QRCode from 'qrcode'
+import {mapState} from 'vuex'
   export default {
     name: 'Pay',
+
+    computed: {
+      ...mapState({
+        payInfo:state=>state.order.payInfo
+      })
+    },
+
+    mounted() {
+      this.$store.dispatch('getPayInfo',this.$route.query.orderId)
+    },
+
+    methods: {
+      pay () {
+        // 生成二维码图片
+        QRCode.toDataURL(this.payInfo.codeUrl)
+          .then(url => { // 二维码图片的url
+            // console.log(url)
+            
+            // 显示图片
+           this.$alert(`<img src="${url}"/>`, '请使用微信扫码支付', { // 配置
+              dangerouslyUseHTMLString: true, // 解析内容标签显示
+              showClose: false, // 不显示右上角的关闭按钮
+              showCancelButton: true, // 显示取消按钮
+              cancelButtonText: '支付中遇到了问题', // 取消按钮的文本
+              confirmButtonText: '我已成功支付', // 确认按钮的文本
+              center: true, // 水平居中显示
+            }).then(() => { // 点击已支付
+              this.$message({
+                type: 'success',
+                message: '支付成功!'
+              })
+              // 跳转到成功界面
+              this.$router.push('paysuccess')
+              // 清除定时器
+              clearInterval(this.intervalId) 
+            }).catch(() => { // 点击遇到问题
+              this.$message({
+                type: 'warning',
+                message: '请联系前台!'
+              }) 
+              // 清除定时器
+              clearInterval(this.intervalId)    
+            })
+
+            // 每隔3s请求获取订单的状态
+            this.intervalId = setInterval(() => {
+              // 如果状态是已支付, 自动跳转到成功界面/关闭对话框/提示
+              this.$API.reqPayStatus(this.$route.query.orderId)
+                .then(result => {
+                  console.log('----------', result.code)
+                if (result.code===200) { // 支付成功
+                    // 关闭对话框
+                    this.$msgbox.close()
+                    // 提示成功
+                    this.$message({
+                      type: 'success',
+                      message: '支付成功!'
+                    })
+                    // 跳转到成功界面
+                    this.$router.push('paysuccess')
+                    // 清除定时器
+                    clearInterval(this.intervalId) 
+
+                    // 删除所有选中的购物车数据
+                    this.$store.dispatch('deleteCheckedCartItems')
+                  } 
+                }).catch(error => { 
+                  // 如果请求失败, 提示获取订单状态失败
+                  this.$message({
+                    type: 'error',
+                    message: '获取支付状态失败!'
+                  })
+                  // 清除定时器
+                  clearInterval(this.intervalId) 
+                })
+              // 如果状态不已支付
+            }, 3000);
+            
+          })
+          .catch(err => {
+            alert('生成支付二维码失败')
+          })
+      }
+    }
   }
 </script>
 

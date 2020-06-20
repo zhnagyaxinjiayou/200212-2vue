@@ -101,6 +101,15 @@ export default {
       try {
         // 分发给登录
          await this.$store.dispatch('login',{mobile, password})
+        // 
+        const redirect=this.$route.query.redirect
+        
+        if(redirect){
+          this.$router.replace(redirect)
+        }else{
+          this.$router.replace('/')
+        }
+
         // 登录成功，自动登录界面
         this.$router.replace('/')
       } catch (error) {

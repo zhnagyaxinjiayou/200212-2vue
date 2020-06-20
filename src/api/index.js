@@ -66,11 +66,34 @@ export function reqLogin(mobile, password) {
 //   mobile
 //   password
 //   code
-export const  reqRegister=(userInfo)=>ajax.post('/user/passport/register',userInfo)
+export const  reqRegister=(userInfo)=>ajax.post('/user/passport/register',userInfo)  
 
 // 退出登录  /api/user/passport/logout  GET
 export const reqLogout=()=>ajax('/user/passport/logout')
 
-// 获取订单列表 /api/order/auth/{page}/{limit} GET
-export const reqOrders=(page,limit)=>ajax(`/order/auth/${page}/${limit}`)
+// 获取订单列表 /api/order/auth/{page}/{limit} GET  
+export const reqOrders=(page,limit)=>ajax(`/order/auth/${page}/${limit}`) 
+
+// 获取订单交易信息 /api/order/auth/trade  GET
+export const reqTradeInfo=()=>ajax('/order/auth/trade')
+
+// 提交订单   /api/order/auth/submitOrder?tradeNo={tradeNo}  POST
+
+// tradeNo：交易号
+// OrderInfo：包含要提交的订单相关信息的对象
+
+export const reqSubmitOrder=(tradeNo,OrderInfo)=>ajax({
+    url:'/order/auth/submitOrder',
+    method:'POST',
+    // query:{tradeNo}, 
+    params: {tradeNo}, // 指定query参数
+    data:OrderInfo
+})
+
+// 获取支付信息 /api/payment/weixin/createNative/{orderId} GET
+export const reqPayInfo=(orderId)=>ajax(`/payment/weixin/createNative/${orderId}`)
+
+// 查询支付订单状态码 /api/payment/weixin/queryPayStatus/{orderId} GET
+export const reqPayStatus=(orderId)=>ajax(`/payment/weixin/queryPayStatus/${orderId}`)
+
 
